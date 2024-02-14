@@ -4,9 +4,13 @@ from typing import Iterable, Set, Dict, Final
 
 from credit_calculator.credit_model import AnnuityCredit
 import matplotlib.pyplot as plt
+import pandas as pd
 
-loan_amount: Final[float] = 400000
-interest_rate_per_year_percent: Final[float] = 3.0
+# pd.set_option("display.precision", 2)
+pd.options.display.float_format = "{:,.2f}".format
+
+loan_amount: Final[float] = 300000
+interest_rate_per_year_percent: Final[float] = 4.0
 
 duration_years: Iterable[int] = range(10, 31, 1)
 
@@ -22,14 +26,20 @@ for duration_year in duration_years:
         repayment_rate_percent=None,
     )
     monthly_rates[duration_year] = credit.get_monthly_rate()
-    
-    
+    # if duration_year == min(duration_years) or duration_year == max(duration_years):
+    # if duration_year % 10 == 0:
+    repayment_plan: pd.DataFrame = credit.get_repayment_plan()
+    for column in ["repayment_amount_euro", "interest_amount_euro", "payment_yearly_euro"]:
+        print(f"Sum {column}: {repayment_plan[column].sum():,.2f}")
+
+
+print("Monthly rates:")
 print(monthly_rates)
 
 plt.scatter(monthly_rates.keys(), monthly_rates.values())
 plt.title(f"Annuitätsdarlehen (Monatsrate bleibt gleich) \n"
           f"Darlehen: {loan_amount:,}€, Sollzins p.a.: {interest_rate_per_year_percent}%")
-plt.ylim(ymin=1000)
+plt.ylim(ymin=500)
 plt.ylabel("Monatsrate (€)")
 plt.xlabel("Kreditdauer (Jahre)")
 
